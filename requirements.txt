@@ -1,11 +1,12 @@
 streamlit==1.46.1
 joblib==1.4.2
-numpy==1.26.4  # 降低版本以适配 numba
+numpy==1.26.4  # 与Python 3.11.9兼容
 pandas==2.3.1
 matplotlib==3.10.3
-shap==0.48.0
+shap==0.48.0  # 兼容numba>=0.54
 dill==0.4.0
 scikit-learn==1.7.0
 lightgbm==4.6.0
 xgboost==3.0.1
-numba==0.60.0  # 新增：与 numpy 1.26.4 兼容，且适配 shap==0.48.0
+numba==0.59.1  # 降低版本，适配llvmlite==0.42.0（预编译包可用）
+llvmlite==0.42.0  # 显式指定，与numba==0.59.1严格匹配，无需编译
