@@ -34,5 +34,3 @@ above three performance metrics. It also includes **SHAP explanations** and **LC
 
 ---
 
-## 📦 Project Structure
-
