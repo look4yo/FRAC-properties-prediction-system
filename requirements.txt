@@ -1,6 +1,6 @@
 streamlit==1.46.1
 joblib==1.4.2
-numpy==2.3.0
+numpy==1.26.4  # 降低版本以适配 numba
 pandas==2.3.1
 matplotlib==3.10.3
 shap==0.48.0
@@ -8,3 +8,4 @@ dill==0.4.0
 scikit-learn==1.7.0
 lightgbm==4.6.0
 xgboost==3.0.1
+numba==0.60.0  # 新增：与 numpy 1.26.4 兼容，且适配 shap==0.48.0
