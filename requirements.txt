@@ -1,0 +1,9 @@
+Cython
+python == 3.11.9
+streamlit == 1.46.1
+joblib == 1.4.2
+numpy ==2.3.0
+pandas == 2.3.1
+matplotlib == 3.10.3
+shap ==0.48.0
+dill == 0.4.0
