@@ -5,3 +5,4 @@ pandas==2.0.3
 matplotlib==3.7.2
 shap==0.44.1
 dill==0.3.8
+scikit-learn --only-binary :all:
