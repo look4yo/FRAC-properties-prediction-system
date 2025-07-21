@@ -8,7 +8,7 @@ import dill
 
 # 显示中文和负号
 plt.rcParams['font.sans-serif'] = ['Times New Roman']
-plt.rcParams['axes.unicode_minus'] = False
+
 # 加载模型
 MQ_voting_model = joblib.load('MQ_voting_model.joblib')
 MS_voting_model = joblib.load('MS_voting_model.joblib')
@@ -53,55 +53,119 @@ fiber_type_mapping = {
     5: "Carbon fiber",
     6: "Bio-fiber"
 }
+
+st.html("""
+<style>
+    [data-testid="stNumberInput"] input {
+        font-size: 30px !important;
+    }
+</style>
+""")
+
+
+def styled_number_input(label, min_value, max_value, value, step, label_fontsize="20px", key=None):
+    # 使用 st.markdown 显示带样式的 label
+    st.markdown(f"<span style='font-size: {label_fontsize}; font-weight: normal;'>{label}</span>",
+                unsafe_allow_html=True)
+
+    # 使用 st.number_input，并隐藏原始 label
+    return st.number_input(
+        " ",  # 空字符串会导致 Streamlit 报错，用空格替代
+        min_value=min_value,
+        max_value=max_value,
+        value=value,
+        step=step,
+        key=key,
+        label_visibility="collapsed"
+    )
+
+
+st.markdown("""
+<style>
+    /* 设置 st.selectbox 下拉框中选中文字和选项字体大小 */
+    .stSelectbox div[data-baseweb="select"] > div {
+        font-size: 22px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+
+def styled_selectbox(label, options, index=0, format_func=None, key=None, label_fontsize="24px", **kwargs):
+    # 使用 markdown 显示自定义 label
+    st.markdown(f"<span style='font-size: {label_fontsize}; font-weight: normal;'>{label}</span>",
+                unsafe_allow_html=True)
+
+    # 使用 st.selectbox，并隐藏原生 label
+    return st.selectbox(
+        " ",  # 用空字符串替代 label
+        options=options,
+        index=index,
+        format_func=format_func,
+        key=key,
+        label_visibility="collapsed",
+        **kwargs
+    )
+
+
 # 创建三列布局
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    with st.expander("Asphalt properties"):
-        st.markdown("""
-        <style>
-        .stNumberInput label {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .stNumberInput input {
-            font-size: 20px;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
-        AC = st.number_input("Asphalt content (AC) [wei.%]", 2.0, 15.0, 5.0, step=0.1)
-        Pe = st.number_input("Penetration (Pe) [0.1 mm]", 30.0, 110.0, 80.0, step=0.1)
-        Du = st.number_input("Ductility (Du) [cm]", 20.0, 200.0, 100.0, step=1.0)
-        SP = st.number_input("Softening point (SP) [℃]", 40.0, 60.0, 50.0, step=0.1)
+    AC = styled_number_input("Asphalt content (AC) [wei.%]", 2.0, 15.0, 5.5, 0.1,
+                             label_fontsize="24px", key="ac")
+    Pe = styled_number_input("Penetration (Pe) [0.1 mm]", 30.0, 110.0, 68.0, 0.1,
+                             label_fontsize="24px", key="pe")
+    Du = styled_number_input("Ductility (Du) [cm]", 20.0, 200.0, 150.0, 1.0,
+                             label_fontsize="24px", key="du")
+    SP = styled_number_input("Softening point (SP) [℃]", 40.0, 60.0, 49.0, 0.1,
+                             label_fontsize="24px", key="sp")
+    Ag2_36 = styled_number_input("Aggregate passing 2.36mm (Ag2.36) [%]", 0.0, 100.0, 47.0, 0.01,
+                                 label_fontsize="24px", key="ag236")
 
 with col2:
-    with st.expander("Aggregate properties"):
-        Ag2_36 = st.number_input("Aggregate passing 2.36mm (Ag2.36) [%]", 0.0, 100.0, 35.0, step=0.01, )
-        Ag4_75 = st.number_input("Aggregate passing 4.75mm (Ag4.75) [%]", 0.0, 100.0, 45.0, step=0.01)
-        Ag9_5 = st.number_input("Aggregate passing 9.5mm (Ag9.5) [%]", 0.0, 100.0, 70.0, step=0.01)
-        AV = st.number_input("Air voids (AV) [%]", 0.0, 25.0, 4.0, step=0.01)
-        VMA = st.number_input("Voids in mineral aggregate (VMA) [%]", 5.0, 70.0, 15.0, step=0.01)
-        VFA = st.number_input("Voids filled with asphalt (VFA) [%]", 10.0, 100.0, 75.0, step=0.01)
+    Ag4_75 = styled_number_input("Aggregate passing 4.75mm (Ag4.75) [%]", 0.0, 100.0, 60.0, 0.01,
+                                 label_fontsize="24px", key="ag475")
+    Ag9_5 = styled_number_input("Aggregate passing 9.5mm (Ag9.5) [%]", 0.0, 100.0, 80.0, 0.01,
+                                label_fontsize="24px", key="ag95")
+    AV = styled_number_input("Air voids (AV) [%]", 0.0, 25.0, 2.8, 0.01,
+                             label_fontsize="24px", key="av")
+    VMA = styled_number_input("Voids in mineral aggregate (VMA) [%]", 5.0, 70.0, 14.63, 0.01,
+                              label_fontsize="24px", key="vma")
+    VFA = styled_number_input("Voids filled with asphalt (VFA) [%]", 10.0, 100.0, 80.0, 0.01,
+                              label_fontsize="24px", key="vfa")
 
 with col3:
-    with st.expander("Fiber properties"):
-        FC = st.number_input("Fiber content (FC) [%]", 0.0, 7.0, 0.3, step=0.01)
-        FT = st.selectbox(
-            "Fiber type (FT)",
-            options=[1, 2, 3, 4, 5, 6],
-            format_func=lambda x: fiber_type_mapping[x],  # 显示纤维类型名称
-            index=0,
-            help="Choose the type of fiber."
-        )
-        FL = st.number_input("Fiber length (FL) [mm]", 0.0, 130.0, 6.0, step=0.01)
-        TS = st.number_input("Tensile strength (TS) [MPa]", 0.0, 10000.0, 50.0, step=0.1)
-        MT = st.number_input("Melting temperature (MT) [℃]", 50.0, 5000.0, 150.0, step=1.0)
+    FT = styled_selectbox(
+        "Fiber type (FT)",
+        options=[1, 2, 3, 4, 5, 6],
+        format_func=lambda x: fiber_type_mapping[x],
+        index=0,
+        key="ft_select",
+        label_fontsize="24px"
+    )
+    FC = styled_number_input("Fiber content (FC) [wei.%]", 0.0, 7.0, 0.6, 0.01,
+                             label_fontsize="24px", key="fc")
+    FL = styled_number_input("Fiber length (FL) [mm]", 0.0, 130.0, 12.0, 0.01,
+                             label_fontsize="24px", key="fl")
+    TS = styled_number_input("Tensile strength (TS) [MPa]", 0.0, 10000.0, 3000.0, 0.1,
+                             label_fontsize="24px", key="ts")
+    MT = styled_number_input("Melting temperature (MT) [℃]", 50.0, 5000.0, 550.0, 1.0,
+                             label_fontsize="24px", key="mt")
 
 # 构建输入数据
 input_data = [[Pe, Du, SP, AC, AV, VMA, VFA, Ag2_36, Ag4_75, Ag9_5,
                FT, FC, FL, TS, MT]]
 
+st.markdown("""
+<style>
+    div.stButton > button {
+        padding: 10px 20px !important; /* 可选：调整按钮内边距 */
+        height: 50px !important;     /* 可选：调整按钮高度 */
+        background-color: #E0F7FF !important; /* 背景色改为淡蓝色 */
+        font-weight: bold !important; /* 字体加粗 */
+    }
+</style>
+""", unsafe_allow_html=True)
 if st.button("Predict three objectives", use_container_width=True):
     # 创建状态提示框
     status_placeholder = st.empty()
@@ -121,8 +185,6 @@ if st.button("Predict three objectives", use_container_width=True):
     st.session_state['fv_prediction'] = fv_prediction
     st.session_state['input_data'] = input_data
 
-    # 更新状态为完成
-
 # 2、显示结果
 st.markdown(
     "<div style='background-color:orange;padding:1px 10px;border-radius:5px;display:inline-block;margin-top:20px;margin-bottom:20px;'>"
@@ -131,40 +193,62 @@ st.markdown(
     unsafe_allow_html=True
 )
 if 'mq_prediction' in st.session_state:
-
     col_mq, col_ms, col_fv = st.columns(3)
 
     with col_mq:
-        st.markdown("<p style='font-size:20px; font-weight:bold;'>Marshall quotient (MQ)</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:25px; font-weight:bold;'>Marshall quotient (MQ)</p>", unsafe_allow_html=True)
         st.markdown(
             f"<div style='background-color:#f0f0f0;padding:10px;border-radius:5px;text-align:center;'>"
-            f"<span style='font-size:18px; font-weight:bold;'>{st.session_state['mq_prediction']:.2f} kN/mm</span></div>",
+            f"<span style='font-size:25px; font-weight:bold;'>{st.session_state['mq_prediction']:.2f} kN/mm</span></div>",
             unsafe_allow_html=True
         )
 
     with col_ms:
-        st.markdown("<p style='font-size:20px; font-weight:bold;'>Marshall stability (MS)</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:25px; font-weight:bold;'>Marshall stability (MS)</p>", unsafe_allow_html=True)
         st.markdown(
             f"<div style='background-color:#f0f0f0;padding:10px;border-radius:5px;text-align:center;'>"
-            f"<span style='font-size:18px; font-weight:bold;'>{st.session_state['ms_prediction']:.2f} kN</span></div>",
+            f"<span style='font-size:25px; font-weight:bold;'>{st.session_state['ms_prediction']:.2f} kN</span></div>",
             unsafe_allow_html=True
         )
 
     with col_fv:
-        st.markdown("<p style='font-size:20px; font-weight:bold;'>Marshall flow value (FV)</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:25px; font-weight:bold;'>Marshall flow value (FV)</p>", unsafe_allow_html=True)
         st.markdown(
             f"<div style='background-color:#f0f0f0;padding:10px;border-radius:5px;text-align:center;'>"
-            f"<span style='font-size:18px; font-weight:bold;'>{st.session_state['fv_prediction']:.2f} mm</span></div>",
+            f"<span style='font-size:25px; font-weight:bold;'>{st.session_state['fv_prediction']:.2f} mm</span></div>",
             unsafe_allow_html=True
         )
 
+    # 特征对应的单位（映射字典）
+    feature_units = {
+        'Pe': '0.1 mm',
+        'Du': 'cm',
+        'SP': '℃',
+        'AC': 'wei.%',
+        'AV': '%',
+        'VMA': '%',
+        'VFA': '%',
+        'Ag2.36': '%',
+        'Ag4.75': '%',
+        'Ag9.5': '%',
+        'FT': '',
+        'FC': 'wei.%',
+        'FL': 'mm',
+        'TS': 'MPa',
+        'MT': '℃'
+    }
+
     # 显示输入参数汇总
     st.subheader("Input parameters summary")
+    # 构造 DataFrame
     input_df = pd.DataFrame(st.session_state['input_data'], columns=features)
-    st.dataframe(input_df.style.format("{:.2f}"), use_container_width=True)
-
-else:
-    st.info("Please input parameters and click Predict three objectives' to see results.")
+    # 添加单位到列名（仅显示时）
+    input_df.rename(columns={f: f"{f} [{feature_units[f]}]" for f in input_df.columns}, inplace=True)
+    # 显示表格（加大字体）
+    st.dataframe(
+        input_df.style.format("{:.2f}").set_properties(**{'font-size': '25px'}),
+        use_container_width=True
+    )
 
 # 3、SHAP分析
 st.markdown(
@@ -182,8 +266,12 @@ if 'mq_prediction' in st.session_state:
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.write("#### SHAP force plot - MQ")
+        st.write("### SHAP force plot - MQ")
         mq_shap_values = MQ_explainer_model.shap_values(original_input)[0]
+        plt.rcParams.update({
+            'font.size': 30,
+            'xtick.labelsize': 30,
+        })
 
         # 使用 SHAP 内部创建的 figure，不手动传入 fig 或 ax
         force_fig = shap.force_plot(
@@ -198,7 +286,7 @@ if 'mq_prediction' in st.session_state:
         st.pyplot(force_fig, clear_figure=True)
 
     with col2:
-        st.write("#### SHAP force plot - MS")
+        st.write("### SHAP force plot - MS")
         ms_shap_values = MS_explainer_model.shap_values(original_input)[0]
 
         force_fig = shap.force_plot(
@@ -212,7 +300,7 @@ if 'mq_prediction' in st.session_state:
         st.pyplot(force_fig, clear_figure=True)
 
     with col3:
-        st.write("#### SHAP force plot - FV")
+        st.write("### SHAP force plot - FV")
         fv_shap_values = FV_explainer_model.shap_values(original_input)[0]
 
         force_fig = shap.force_plot(
@@ -229,7 +317,7 @@ if 'mq_prediction' in st.session_state:
     col4, col5, col6 = st.columns(3)
 
     with col4:
-        st.write("#### SHAP waterfall plot - MQ")
+        st.write("### SHAP waterfall plot - MQ")
         plt.figure()
         shap.plots.waterfall(
             shap.Explanation(
@@ -245,7 +333,7 @@ if 'mq_prediction' in st.session_state:
         plt.close()
 
     with col5:
-        st.write("#### SHAP waterfall plot - MS")
+        st.write("### SHAP waterfall plot - MS")
         plt.figure()
         shap.plots.waterfall(
             shap.Explanation(
@@ -261,7 +349,7 @@ if 'mq_prediction' in st.session_state:
         plt.close()
 
     with col6:
-        st.write("#### SHAP waterfall plot - FV")
+        st.write("### SHAP waterfall plot - FV")
         plt.figure()
         shap.plots.waterfall(
             shap.Explanation(
@@ -275,8 +363,6 @@ if 'mq_prediction' in st.session_state:
         )
         st.pyplot(plt.gcf())
         plt.close()
-
-# ... existing code ...
 
 # 定义每个组分的成本、碳足迹和隐含能参数
 inventory_data = {
@@ -318,7 +404,7 @@ def calculate_lca_components(AC, FC, Ag2_36, FT):
     filler_density = 2.81  # Filler aggregate density (g/cm³)
     filler_ratio = 0.062  # Ratio of filler to aggregate
 
-    # 计算 Aggregate + Filler content (wei.%)
+    # 计算 Aggregate + Filler content
     agg_filler_content_wei = 100 - AC - FC
 
     # 计算 Filler content (vol.%)
@@ -337,19 +423,19 @@ def calculate_lca_components(AC, FC, Ag2_36, FT):
             filler_content_vol * filler_density
     )
 
-    # 计算 Coarse content (wei.%)
+    # 计算 Coarse content
     coarse_content_wei = (
             (coarse_content_vol * coarse_agg_density / agg_filler_weight) *
             ((coarse_content_vol + fine_content_vol + filler_content_vol) / 100) * 100
     )
 
-    # 计算 Fine content (wei.%)
+    # 计算 Fine content
     fine_content_wei = (
             (fine_content_vol * fine_agg_density / agg_filler_weight) *
             ((coarse_content_vol + fine_content_vol + filler_content_vol) / 100) * 100
     )
 
-    # 计算 Filler content (wei.%)
+    # 计算 Filler content
     filler_content_wei = (
             (filler_content_vol * filler_density / agg_filler_weight) *
             ((coarse_content_vol + fine_content_vol + filler_content_vol) / 100) * 100
@@ -405,17 +491,9 @@ def calculate_lca_components(AC, FC, Ag2_36, FT):
     }
 
 
-def plot_contribution_pie_chart(contributions, labels, title):
-    """
-    绘制贡献饼状图
-
-    :param contributions: list of float, 各项贡献值
-    :param labels: list of str, 各项标签
-    :param title: str, 图表标题
-    """
+def plot_contribution_pie_chart(contributions, labels, title, title_fontsize=22):  # 新增参数
     fig, ax = plt.subplots(figsize=(6, 6))
 
-    # 绘制饼状图
     wedges, texts, autotexts = ax.pie(
         contributions,
         labels=labels,
@@ -425,11 +503,18 @@ def plot_contribution_pie_chart(contributions, labels, title):
         textprops=dict(color="black")
     )
 
-    # 设置标题
-    ax.set_title(title, fontsize=16)
+    ax.set_title(title, fontsize=title_fontsize)  # 使用传入的字体大小
 
-    # 返回图表对象
     return fig
+
+
+def styled_metric(label, value, label_fontsize="25px", value_fontsize="35px"):
+    st.markdown(f"""
+    <div style="font-size: {label_fontsize}; font-weight: bold; margin-bottom: 8px;">
+        {label}<br>
+        <span style="font-size: {value_fontsize}; font-weight: normal;">{value}</span>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 # LCA结果
@@ -462,31 +547,32 @@ if 'mq_prediction' in st.session_state:
     st.header("Sample composition")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("Asphalt content (wei.%)", f"{lca_result['AC']:.2f} %")
-        st.metric("Coarse aggregate content (wei.%)", f"{lca_result['Coarse content']:.2f} %")
+        styled_metric("Asphalt content", f"{lca_result['AC']:.2f} %")
+        styled_metric("Coarse aggregate content", f"{lca_result['Coarse content']:.2f} %")
 
     with col2:
-        st.metric("Fiber content (wei.%)", f"{lca_result['FC']:.2f} %")
-        st.metric("Fine aggregate content (wei.%)", f"{lca_result['Fine content']:.2f} %")
+        styled_metric("Fiber content", f"{lca_result['FC']:.2f} %")
+        styled_metric("Fine aggregate content", f"{lca_result['Fine content']:.2f} %")
 
     with col3:
-        st.metric("Fiber type", fiber_type_mapping.get(FT_value, "Unknown"))
-        st.metric("Filler content (wei.%)", f"{lca_result['Filler content']:.2f} %")
+        styled_metric("Fiber type", fiber_type_mapping.get(FT_value, "Unknown"))
+        styled_metric("Filler content", f"{lca_result['Filler content']:.2f} %")
 
     # 显示 Total 和 MQ-normalized 的结果
     st.header("LCA results")
     col4, col5, col6 = st.columns(3)
     with col4:
-        st.metric("Total cost (USD/Kg)", f"{lca_result['Total cost']:.2f} USD/Kg")
-        st.metric("MQ-normalized cost (USD/(kN/mm))", f"{mq_normalized_cost:.2f} USD/(kN/mm)")
+        styled_metric("Total cost", f"{lca_result['Total cost']:.2f} USD/Kg")
+        styled_metric("MQ-normalized cost", f"{mq_normalized_cost:.2f} USD/(kN/mm)")
 
     with col5:
-        st.metric("Total carbon footprint (kg/Kg)", f"{lca_result['Total carbon footprint']:.2f} kg/Kg")
-        st.metric("MQ-normalized carbon footprint (kg/(kN/mm))", f"{mq_normalized_carbon_footprint:.2f} kg/(kN/mm)")
+        styled_metric("Total carbon footprint", f"{lca_result['Total carbon footprint']:.2f} kg/Kg")
+        styled_metric("MQ-normalized carbon footprint", f"{mq_normalized_carbon_footprint:.2f} kg/(kN/mm)")
 
     with col6:
-        st.metric("Total energy consumption (MJ/Kg)", f"{lca_result['Total energy consumption']:.2f} MJ/Kg")
-        st.metric("MQ-normalized energy consumption (MJ/(kN/mm))", f"{mq_normalized_energy_consumption:.2f} MJ/(kN/mm)")
+        styled_metric("Total energy consumption", f"{lca_result['Total energy consumption']:.2f} MJ/Kg")
+        styled_metric("MQ-normalized energy consumption",
+                      f"{mq_normalized_energy_consumption:.2f} MJ/(kN/mm)")
 
     # 定义各项贡献值和标签
     contribution_labels = ['Asphalt', 'Fiber', 'Coarse aggregate', 'Fine aggregate', 'Filler']
@@ -520,6 +606,13 @@ if 'mq_prediction' in st.session_state:
 
     # 绘制并展示饼状图
     st.header("Contribution pie charts")
+    plt.rcParams.update({
+        'font.size': 18,
+        'axes.titlesize': 20,
+        'axes.labelsize': 18,
+        'xtick.labelsize': 16,
+        'ytick.labelsize': 16
+    })
 
     col7, col8, col9 = st.columns(3)
     with col7:
